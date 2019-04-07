@@ -8,8 +8,11 @@ export default class InputDefaultState extends InputState {
     {
         console.log("default");
     }
-    touchEvent()
+    touch(touchEvent:cc.Touch)
     {
         console.log("touch"+this.context.name);
+        this.context._tar.forEach(value=>{
+            value.touch(touchEvent);
+        })
     }
 }

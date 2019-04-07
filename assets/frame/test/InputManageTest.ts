@@ -1,3 +1,5 @@
+import InputManage, { IInput } from "../InputManage";
+
 // Learn TypeScript:
 //  - [Chinese] https://docs.cocos.com/creator/manual/zh/scripting/typescript.html
 //  - [English] http://www.cocos2d-x.org/docs/creator/manual/en/scripting/typescript.html
@@ -11,11 +13,19 @@
 const {ccclass, property} = cc._decorator;
 
 @ccclass
-export default class setToFullScene extends cc.Component {
+export default class InputManageTest extends cc.Component implements IInput {
+    touchStart(touchEvent: cc.Touch) {
+    }
+    touchEnd(touchEvent: cc.Touch) {
+    }
+    touchCancel(touchEvent: cc.Touch) {
+    }
+    touch(touchEvent:cc.Touch) {
+        console.log(touchEvent.getLocation());
+    }
 
     start () {
-        var size = cc.winSize;
-        this.node.setContentSize(size);
+        InputManage.getInstance().addInput(this);
     }
 
     // update (dt) {}
