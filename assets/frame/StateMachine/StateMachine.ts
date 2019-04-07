@@ -1,6 +1,91 @@
 import State, { OperatorStruct } from "./State";
-
-
+export class AwaitNext
+{
+    type:number
+}
+export class AwaitNextUpdate extends AwaitNext
+{
+    count:number;
+    constructor(count:number=1)
+    {
+        super();
+        this.count = count;
+    }
+}
+export class AwaitNextSecond extends AwaitNext
+{
+    time:number;
+    constructor(sec:number)
+    {
+        super()
+        this.time = sec;
+    }
+}
+class DCoroutine
+{
+    time:number;
+    count:number;
+    type:number;
+    NIter:Iterator<AwaitNext>;
+    timmer:number;
+    countor:number;
+    callback:(dc:DCoroutine)=>any;
+    constructor(Iter:Iterator<AwaitNext>,callback:(dc:DCoroutine)=>any)
+    {
+        this.NIter = Iter;
+        this.callback = callback;
+    }
+    setAttr(dt:number)
+    {
+        var result = this.NIter.next(dt);
+        if(result.done)
+        {
+            this.type = result.value.type;
+            switch (result.value.type) {
+                case 1:
+                this.count = (<AwaitNextUpdate>result.value).count;
+                break;
+                case 2:
+                this.time = (<AwaitNextSecond>result.value).time;
+                break;
+                default:
+                    break;
+            }
+        }
+        else
+        {
+            this.callback(this);
+        }
+    }
+    Update(dt:number)
+    {
+        switch(this.type)
+        {
+            case 1:
+            if(this.countor<this.count)
+            {
+                this.countor++;
+            }
+            else
+            {
+                this.countor == 0;
+                this.setAttr(dt);
+            }
+            break;
+            case 2:
+            if(this.timmer<this.time)
+            {
+                this.timmer+=dt;
+            }
+            else
+            {
+                this.timmer = 0;
+                this.setAttr(dt);
+            }
+            break;
+        }
+    }
+}
 const { ccclass, property } = cc._decorator;
 @ccclass
 export default class StateMachine extends cc.Component {
@@ -10,6 +95,7 @@ export default class StateMachine extends cc.Component {
     stateIns:{Ins:State,Name:string}[]=[];
     strelation:SR[];
     LSMDB:SM;
+    Coroutines:DCoroutine[] = [];
     changeState(cs: State) {
         if (this.nowState) this.nowState.Quit();
         this.nowState = cs;
@@ -22,6 +108,21 @@ export default class StateMachine extends cc.Component {
             this.stateIns.push({Ins:st,Name:value.name})
         })
         this.emit('start')
+    }
+    startCoroutine(iter:Iterator<AwaitNext>)
+    {
+        this.Coroutines.push(new DCoroutine(iter,dc=>{
+            this.Coroutines.splice(this.Coroutines.findIndex(value=>{return value === dc}),1);
+        }));
+    }
+    update(dt:number)
+    {
+        if(this.Coroutines.length!=0)
+        {
+            this.Coroutines.forEach(value=>{value.Update(dt)});
+        }
+        var op = OperatorStruct.getinstance();
+        if(this.nowState)this.nowState.update(dt,op);
     }
     attachState<T extends State>(type: { prototype: T, apply: Function }): T {
         //创建实例
@@ -129,6 +230,18 @@ export default class StateMachine extends cc.Component {
             }
         }
         
+    }
+    onDestroy()
+    {
+        super.onDisable();
+        this.nowState.Quit();
+        this.sqs.forEach(value=>{value.Quit()});
+    }
+    onDisable()
+    {
+        super.onDisable();
+        this.nowState.disable();
+        this.sqs.forEach(value=>{value.disable()});
     }
 
 }

@@ -44,6 +44,10 @@ export default class State  {
     {
 
     }
+    disable()
+    {
+        
+    }
     Quit()
     {
         if(this.quitEvent)this.quitEvent(this);

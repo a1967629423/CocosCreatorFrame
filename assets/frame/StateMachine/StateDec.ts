@@ -84,7 +84,6 @@ export function mLinkTo<T extends State, P extends StateMachine>(targenamet: str
         }
     }
     return (target: { new(cxt:P):T }) => {
-        debugger
         if (!target.prototype['_su_']) {
             setTimeout(() => { initLink(target) });
         }
