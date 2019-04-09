@@ -25,7 +25,8 @@ export default class InputManageTest extends cc.Component implements IInput {
     }
 
     start () {
-        InputManage.getInstance().addInput(this);
+        setTimeout(()=>{InputManage.getInstance().addInput(this);},1000)
+        
     }
 
     // update (dt) {}

@@ -1,6 +1,10 @@
-import OPool from "./OPool";
-
-export default class ObjectPool<T extends OPool> {
+export interface IObpool
+{
+    unuse();
+    reuse();
+    destroy();
+}
+export default class ObjectPool<T> {
     __pool:T[]=[]
     /**
      * false为弹出第一个true为弹出最后一个
@@ -16,11 +20,17 @@ export default class ObjectPool<T extends OPool> {
     }
     public push(v:T)
     {
-        if(v._isOnLoadCalled)
+        if(v['_poolisload'])
         {
-            v.unuse()
+            if(v['unuse'])v['unuse']();
         }
-        v.node.removeFromParent()
+        else
+        {
+            v['_poolisload']=true;
+        }
+        if(v['node'])(<cc.Node>v['node']).removeFromParent();
+        else
+        if(v['removeFromParent'])v['removeFromParent']();
         this.__pool.push(v)
     }
     public pop():T
@@ -34,7 +44,7 @@ export default class ObjectPool<T extends OPool> {
     public clear()
     {
         this.__pool.forEach(value=>{
-            value.destroy()
+            if(value['destroy'])value['destroy']();
         })
         this.__pool=[]
     }

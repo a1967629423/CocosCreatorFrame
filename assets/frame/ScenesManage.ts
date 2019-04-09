@@ -4,13 +4,13 @@ import { mSyncFunc, mStateMachine } from "./StateMachine/StateDec";
 const {ccclass, property} = cc._decorator;
 export interface IScenesManage
 {
-    loadScenes(scenesName:string,time:number,callback?:()=>null);
+    loadScenes(scenesName:string,time:number,callback?:()=>void);
 }
 @mStateMachine
 @ccclass
 export default class ScenesManage extends StateMachine implements IScenesManage {
     @mSyncFunc
-    loadScenes(scenesName: string, time: number, callback: () => null) {
+    loadScenes(scenesName: string, time: number, callback: () => void) {
     }
 
     // LIFE-CYCLE CALLBACKS:
@@ -35,7 +35,7 @@ export default class ScenesManage extends StateMachine implements IScenesManage 
 }
 export class  ScenesState extends State implements IScenesManage
 {
-    loadScenes(scenesName: string, time: number, callback: () => null) {
+    loadScenes(scenesName: string, time: number, callback: () => void) {
 
     }
     get context():ScenesManage

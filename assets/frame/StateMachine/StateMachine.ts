@@ -29,8 +29,8 @@ class DCoroutine
     NIter:Iterator<AwaitNext>;
     timmer:number;
     countor:number;
-    callback:(dc:DCoroutine)=>any;
-    constructor(Iter:Iterator<AwaitNext>,callback:(dc:DCoroutine)=>any)
+    callback:(dc:DCoroutine)=>void;
+    constructor(Iter:Iterator<AwaitNext>,callback?:(dc:DCoroutine)=>void)
     {
         this.NIter = Iter;
         this.callback = callback;
@@ -96,6 +96,7 @@ export default class StateMachine extends cc.Component {
     strelation:SR[];
     LSMDB:SM;
     Coroutines:DCoroutine[] = [];
+    protected listenlist:{eventName:string,callback:(eventName:string)=>void}[] = [];
     changeState(cs: State) {
         if (this.nowState) this.nowState.Quit();
         this.nowState = cs;
@@ -109,17 +110,21 @@ export default class StateMachine extends cc.Component {
         })
         this.emit('start')
     }
-    startCoroutine(iter:Iterator<AwaitNext>)
+    startCoroutine(iter:DCoroutine)
     {
-        this.Coroutines.push(new DCoroutine(iter,dc=>{
-            this.Coroutines.splice(this.Coroutines.findIndex(value=>{return value === dc}),1);
-        }));
+        iter.callback=value=>{
+            this.Coroutines.splice(this.Coroutines.findIndex(cor=>{return cor===value }),1); 
+        }
+        this.Coroutines.push(iter);
     }
     update(dt:number)
     {
         if(this.Coroutines.length!=0)
         {
-            this.Coroutines.forEach(value=>{value.Update(dt)});
+            for(var i =this.Coroutines.length-1;i>=0;i--)
+            {
+                this.Coroutines[i].Update(dt);
+            }
         }
         var op = OperatorStruct.getinstance();
         if(this.nowState)this.nowState.update(dt,op);
@@ -180,7 +185,7 @@ export default class StateMachine extends cc.Component {
     }
 
 
-    forEachAttach(functionName:string,os:OperatorStruct,...arg)
+    forEachAttach(functionName:string,os:OperatorStruct<any>,...arg)
     {
         if(this.sqs.length>0)
         {
@@ -230,6 +235,23 @@ export default class StateMachine extends cc.Component {
             }
         }
         
+    }
+    private listenToemit(eventName:string)
+    {
+        this.emit(eventName);
+    }
+    protected listen(eventName:string)
+    {
+        if(!this.listenlist.find(value=>value.eventName===eventName))
+        {
+            var callback = (function(eventName){
+                return ()=>{
+                    this.listenToemit(eventName)
+                } 
+            })(eventName)
+            this.listenlist.push({eventName:eventName,callback:callback})
+            this.node.on(eventName,callback,this);
+        }
     }
     onDestroy()
     {

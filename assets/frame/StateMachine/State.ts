@@ -1,31 +1,35 @@
 import StateMachine from "./StateMachine";
+import ObjectPool, { IObpool } from "../ObjectPool/ObjectPool";
 
-export class OperatorStruct
+export class OperatorStruct<Q> implements IObpool
 {
-    public canOperator:boolean = true;
-    public operatorInformation:any = Object.create(null);
-    public static cachesOperator:OperatorStruct = null;
-    public static getinstance():OperatorStruct
-    {
-        //角色只有一个，所以只有一个Operator
-        let op;
-        if(!this.cachesOperator)op = new OperatorStruct();
-        else
-        {
-            op = this.cachesOperator;
-            this.cachesOperator = null;
-        }
-        return op;
+    unuse() {
+        this.canOperator = true;
+        this.operatorInformation = Object.create(null);
     }
-    constructor()
+    reuse() {
+    }
+    public canOperator:boolean = true;
+    public operatorValue:Q = null;
+    public operatorInformation:any = Object.create(null);
+    public static OP:ObjectPool<OperatorStruct<any>> = new ObjectPool<OperatorStruct<any>>(false);
+    public static getinstance<T>(value?:T):OperatorStruct<T>
     {
-        if(!OperatorStruct.cachesOperator)OperatorStruct.cachesOperator = this;
+        var os:OperatorStruct<T> = this.OP.pop();
+        if(!os)
+        {
+            os = new OperatorStruct(value);
+            this.OP.push(os);
+        }
+        return os;
+    }
+    constructor(value?:Q)
+    {
+        this.operatorValue = value;
+        //if(!OperatorStruct.cachesOperator)OperatorStruct.cachesOperator = this;
     }
     destroy()
     {
-        this.canOperator = true;
-        this.operatorInformation = Object.create(null);
-        OperatorStruct.cachesOperator = this;
     }
 }
 export default class State  {
@@ -40,7 +44,7 @@ export default class State  {
     Start () {
 
     }
-    update(dt:number,op:OperatorStruct)
+    update(dt:number,op:OperatorStruct<any>)
     {
 
     }
