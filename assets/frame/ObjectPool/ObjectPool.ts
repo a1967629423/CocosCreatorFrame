@@ -14,7 +14,7 @@ export default class ObjectPool<T> {
      * 
      * @param dir 弹出方向
      */
-    constructor(dir:boolean)
+    constructor(dir:boolean = false)
     {
         this.dir=dir
     }

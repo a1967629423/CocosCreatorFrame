@@ -1,4 +1,5 @@
-import InputManage, { IInput } from "../InputManage";
+import InputManage from "../InputManage";
+import { AwaitNext, AwaitNextSecond } from "../StateMachine/StateMachine";
 
 // Learn TypeScript:
 //  - [Chinese] https://docs.cocos.com/creator/manual/zh/scripting/typescript.html
@@ -13,23 +14,20 @@ import InputManage, { IInput } from "../InputManage";
 const {ccclass, property} = cc._decorator;
 
 @ccclass
-export default class InputManageTest extends cc.Component implements IInput {
-    touchStart(touchEvent: cc.Touch) {
-    }
-    touchEnd(touchEvent: cc.Touch) {
-    }
-    touchCancel(touchEvent: cc.Touch) {
-    }
-    touch(touchEvent:cc.Touch) {
-        console.log(touchEvent.getLocation());
-    }
-
+export default class MachineCor extends cc.Component {
     start () {
         if(CC_DEBUG)
         {
-            InputManage.getInstance().addInput(this)
-            var play = this.getComponent(dragonBones.ArmatureDisplay);
-        }  
+            console.log('start');
+            InputManage.getInstance().startCoroutine_Auto((function*():Iterator<AwaitNext>{
+                for(var i=0;i<10;i++)
+                {
+                    yield new AwaitNextSecond(1);
+                    console.log(i);
+                }
+                
+            })())
+        }
     }
 
     // update (dt) {}

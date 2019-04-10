@@ -1,14 +1,15 @@
 import State, { OperatorStruct } from "./State";
 export class AwaitNext
 {
-    type:number
+    count:number =1;
+    type:number =1;
 }
 export class AwaitNextUpdate extends AwaitNext
 {
-    count:number;
     constructor(count:number=1)
     {
         super();
+        this.type = 1;
         this.count = count;
     }
 }
@@ -18,43 +19,49 @@ export class AwaitNextSecond extends AwaitNext
     constructor(sec:number)
     {
         super()
+        this.type = 2;
         this.time = sec;
     }
 }
 class DCoroutine
 {
-    time:number;
-    count:number;
-    type:number;
+    time:number=0;
+    count:number=0;
+    type:number=0;
     NIter:Iterator<AwaitNext>;
-    timmer:number;
-    countor:number;
+    timmer:number=0;
+    countor:number=0;
     callback:(dc:DCoroutine)=>void;
     constructor(Iter:Iterator<AwaitNext>,callback?:(dc:DCoroutine)=>void)
     {
         this.NIter = Iter;
+        this.setAttr(0);
         this.callback = callback;
     }
     setAttr(dt:number)
     {
         var result = this.NIter.next(dt);
-        if(result.done)
+        if(!result.done)
         {
-            this.type = result.value.type;
-            switch (result.value.type) {
-                case 1:
-                this.count = (<AwaitNextUpdate>result.value).count;
-                break;
-                case 2:
-                this.time = (<AwaitNextSecond>result.value).time;
-                break;
-                default:
-                    break;
-            }
+            this.setValue(result.value?result.value:new AwaitNextUpdate(1));
         }
         else
         {
-            this.callback(this);
+            if(this.callback)this.callback(this);
+        }
+    }
+    setValue(value:AwaitNext)
+    {
+        this.type = value.type;
+        switch (this.type) {
+            case 1:
+            this.count = (<AwaitNextUpdate>value).count;
+            break;
+            case 2:
+            this.time = (<AwaitNextSecond>value).time;
+            break;
+            default:
+                break;
         }
     }
     Update(dt:number)
@@ -62,11 +69,8 @@ class DCoroutine
         switch(this.type)
         {
             case 1:
-            if(this.countor<this.count)
-            {
-                this.countor++;
-            }
-            else
+            this.countor++;
+            if(this.countor>=this.count)
             {
                 this.countor == 0;
                 this.setAttr(dt);
@@ -116,6 +120,10 @@ export default class StateMachine extends cc.Component {
             this.Coroutines.splice(this.Coroutines.findIndex(cor=>{return cor===value }),1); 
         }
         this.Coroutines.push(iter);
+    }
+    startCoroutine_Auto(iter:Iterator<AwaitNext>)
+    {
+        this.startCoroutine(new DCoroutine(iter));
     }
     update(dt:number)
     {

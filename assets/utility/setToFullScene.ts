@@ -1,3 +1,5 @@
+import EventCenter from "../frame/EventCenter";
+
 // Learn TypeScript:
 //  - [Chinese] https://docs.cocos.com/creator/manual/zh/scripting/typescript.html
 //  - [English] http://www.cocos2d-x.org/docs/creator/manual/en/scripting/typescript.html
@@ -12,10 +14,21 @@ const {ccclass, property} = cc._decorator;
 
 @ccclass
 export default class setToFullScene extends cc.Component {
-
+    setSize()
+    {
+        this.node.setContentSize(cc.winSize);
+    }
     start () {
-        var size = cc.winSize;
-        this.node.setContentSize(size);
+        if(!window.onresize)
+        {
+            window.onresize = ()=>{EventCenter.Instance.node.emit("resize")}
+        }
+        EventCenter.Instance.node.on('resize',this.setSize,this);
+        this.setSize();
+    }
+    onDestroy()
+    {
+        EventCenter.Instance.node.off('resize',this.setSize,this);
     }
 
     // update (dt) {}

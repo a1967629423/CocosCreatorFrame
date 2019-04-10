@@ -10,11 +10,12 @@ export interface IAnimationStateMachine
 const {ccclass, property} = cc._decorator;
 @mStateMachine
 @ccclass
+@cc._decorator.requireComponent(dragonBones.ArmatureDisplay)
 export default class AnimationStateMachine extends StateMachine implements IAnimationStateMachine {
 
 
     start () {
-
+        
     }
 
     // update (dt) {}

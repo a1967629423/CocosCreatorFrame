@@ -6,10 +6,12 @@ import InputManage from "../InputManage";
 export default class InputDefaultState extends InputState {
     Start()
     {
+        if(CC_DEBUG)
         console.log("default");
     }
     touch(touchEvent:cc.Touch)
     {
+        if(CC_DEBUG)
         console.log("touch"+this.context.name);
         this.context._tar.forEach(value=>{
             value.touch(touchEvent);

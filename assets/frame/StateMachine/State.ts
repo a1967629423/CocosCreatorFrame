@@ -32,7 +32,7 @@ export class OperatorStruct<Q> implements IObpool
     {
     }
 }
-export default class State  {
+export default class State   {
     stateName:string =''
     quitEvent:Function = null;
     context:StateMachine = null;
