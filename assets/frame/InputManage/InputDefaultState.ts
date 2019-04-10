@@ -17,4 +17,28 @@ export default class InputDefaultState extends InputState {
             value.touch(touchEvent);
         })
     }
+    touchStart(touchEvent:cc.Touch)
+    {
+        if(CC_DEBUG)
+        console.log("touchStart"+this.context.name);
+        this.context._tar.forEach(value=>{
+            value.touch(touchEvent);
+        })
+    }
+    touchCancel(touchEvent:cc.Touch)
+    {
+        if(CC_DEBUG)
+        console.log("touchCancel"+this.context.name);
+        this.context._tar.forEach(value=>{
+            value.touch(touchEvent);
+        })
+    }
+    touchEnd(touchEvent:cc.Touch)
+    {
+        if(CC_DEBUG)
+        console.log("touchEnd"+this.context.name);
+        this.context._tar.forEach(value=>{
+            value.touch(touchEvent);
+        })
+    }
 }

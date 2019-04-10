@@ -18,8 +18,4 @@ export default class InputState extends State implements IInput {
     {
         super.context = value;
     }
-    touchEvent()
-    {
-
-    }
 }
