@@ -86,6 +86,10 @@ export default class InputManage extends StateMachine implements IInput {
     {
         this._tar.push(inp);
     }
+    removeInput(inp:IInput)
+    {
+        this._tar.splice(this._tar.findIndex(value=>value===inp),1)
+    }
     start()
     {
         super.start();

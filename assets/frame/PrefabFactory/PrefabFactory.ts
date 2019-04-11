@@ -15,10 +15,27 @@ export default class PrefabFactor extends cc.Component {
 
     // onLoad () {}
     PrefabPool:{name:string,pool:ObjectPool<cc.Node>,prefab:cc.Prefab}[] = []
+    static NodePush(node:cc.Node)
+    {
+        var factory:PrefabFactor =node['__factory']
+        if(factory)
+        {
+            factory.push(node);
+        }
+        else
+        {
+            if(CC_DEBUG)
+            {
+                console.log('node not have factory');
+                console.log(node);
+            }
+        }
+    }
     Nodefactory(pre:cc.Prefab)
     {
         var node = cc.instantiate(pre);
         node['__factoryName']=pre.name;
+        node['__factory']=this;
         return node;
     }
     start () {
@@ -34,9 +51,17 @@ export default class PrefabFactor extends cc.Component {
             })
         }
     }
-    pop(name:string):cc.Node
+    pop(name:string|number):cc.Node
     {
-        var rePool = this.PrefabPool.find(value=>value.name===name);
+        var rePool = null;
+        if(typeof name === 'string')
+        {
+            rePool = this.PrefabPool.find(value=>value.name===name);
+        }
+        else if(typeof name === 'number')
+        [
+            rePool = this.PrefabPool.length>name?this.PrefabPool[name]:null
+        ]
         if(rePool)
         {
             var renode = rePool.pool.pop();

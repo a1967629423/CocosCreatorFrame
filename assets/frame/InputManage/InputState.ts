@@ -10,12 +10,13 @@ export default class InputState extends State implements IInput {
     }
     touch(touchEvent: cc.Touch) {
     }
+    ctx:InputManage
     get context():InputManage
     {
-        return <InputManage>super.context;
+        return <InputManage>this.ctx
     }
     set context(value)
     {
-        super.context = value;
+        this.ctx  = value;
     }
 }
