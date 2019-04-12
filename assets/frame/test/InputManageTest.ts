@@ -1,4 +1,5 @@
-import InputManage, { IInput } from "../InputManage";
+import { IPSM, IInput } from "../InputManage";
+
 
 // Learn TypeScript:
 //  - [Chinese] https://docs.cocos.com/creator/manual/zh/scripting/typescript.html
@@ -11,7 +12,7 @@ import InputManage, { IInput } from "../InputManage";
 //  - [English] http://www.cocos2d-x.org/docs/creator/manual/en/scripting/life-cycle-callbacks.html
 
 const {ccclass, property} = cc._decorator;
-
+const {InputManage}=IPSM
 @ccclass
 export default class InputManageTest extends cc.Component implements IInput {
     touchStart(touchEvent: cc.Touch) {

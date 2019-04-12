@@ -1,6 +1,6 @@
-import StateMachine from "./StateMachine/StateMachine";
-import { mStateMachine, mState } from "./StateMachine/StateDec";
-import State from "./StateMachine/State";
+import  { MSM } from "./StateMachine/StateMachine";
+import {  MSMDsc } from "./StateMachine/StateDec";
+
 
 export interface IAnimationStateMachine
 {
@@ -8,6 +8,8 @@ export interface IAnimationStateMachine
 }
 
 const {ccclass, property} = cc._decorator;
+const { mStateMachine, mState }=MSMDsc
+const {StateMachine,State} = MSM
 @mStateMachine
 @ccclass
 @cc._decorator.requireComponent(dragonBones.ArmatureDisplay)

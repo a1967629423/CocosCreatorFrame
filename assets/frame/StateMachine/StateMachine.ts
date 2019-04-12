@@ -1,4 +1,67 @@
-import State, { OperatorStruct } from "./State";
+import ObjectPool, { IObpool } from "../ObjectPool/ObjectPool";
+export module MSM
+{
+    export class OperatorStruct<Q> implements IObpool
+{
+    unuse() {
+        this.canOperator = true;
+        this.operatorInformation = Object.create(null);
+    }
+    reuse() {
+    }
+    public canOperator:boolean = true;
+    public operatorValue:Q = null;
+    public operatorInformation:any = Object.create(null);
+    public static OP:ObjectPool<OperatorStruct<any>> = new ObjectPool<OperatorStruct<any>>(false);
+    public static getinstance<T>(value?:T):OperatorStruct<T>
+    {
+        var os:OperatorStruct<T> = this.OP.pop();
+        if(!os)
+        {
+            os = new OperatorStruct(value);
+            this.OP.push(os);
+        }
+        return os;
+    }
+    constructor(value?:Q)
+    {
+        this.operatorValue = value;
+        //if(!OperatorStruct.cachesOperator)OperatorStruct.cachesOperator = this;
+    }
+    destroy()
+    {
+    }
+}
+export  class State   {
+    stateName:string =''
+    quitEvent:Function = null;
+    context:StateMachine = null;
+    _isAttach:boolean =false;
+    constructor(cxt:StateMachine)
+    {
+        this.context = cxt;
+    }
+    Start () {
+
+    }
+    update(dt:number,op:OperatorStruct<any>)
+    {
+
+    }
+    disable()
+    {
+        
+    }
+    Quit()
+    {
+        if(this.quitEvent)this.quitEvent(this);
+    }
+    done()
+    {
+        if(this._isAttach)this.context.attachQuit(this);
+        this.context.emit("done");
+    }
+}
 export class AwaitNext
 {
     count:number =1;
@@ -92,7 +155,7 @@ class DCoroutine
 }
 const { ccclass, property } = cc._decorator;
 @ccclass
-export default class StateMachine extends cc.Component {
+export class StateMachine extends cc.Component {
     nowState: State = null
     attachment: { ch: State[], construct: { prototype: State } }[] = [];
     sqs: State[] = [];
@@ -275,3 +338,5 @@ export default class StateMachine extends cc.Component {
     }
 
 }
+}
+

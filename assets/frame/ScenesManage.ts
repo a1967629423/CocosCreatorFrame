@@ -1,7 +1,9 @@
-import StateMachine from "./StateMachine/StateMachine";
-import State from "./StateMachine/State";
-import { mSyncFunc, mStateMachine } from "./StateMachine/StateDec";
+import { MSM } from "./StateMachine/StateMachine";
+import { MSMDsc } from "./StateMachine/StateDec";
+
 const {ccclass, property} = cc._decorator;
+const {mStateMachine,mSyncFunc}=MSMDsc;
+const {StateMachine,State}=MSM;
 export interface IScenesManage
 {
     loadScenes(scenesName:string,time:number,callback?:()=>void);

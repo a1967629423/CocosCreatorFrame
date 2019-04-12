@@ -1,9 +1,10 @@
-import InputState from "./InputState";
-import { mState, mDefaultState } from "../StateMachine/StateDec";
-import InputManage from "../InputManage";
+import { MSMDsc } from "../StateMachine/StateDec";
+import { IPSM } from "../InputManage";
+const { mState, mDefaultState }  = MSMDsc
+const {InputState,InputManage} = IPSM;
 @mState("default",InputManage)
 @mDefaultState
-export default class InputDefaultState extends InputState {
+export default class InputDefaultState extends  InputState{
     Start()
     {
         if(CC_DEBUG)

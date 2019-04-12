@@ -1,7 +1,7 @@
 import ScenesManage, { ScenesState } from "../ScenesManage";
-import { mState, mDefaultState } from "../StateMachine/StateDec";
-@mState("Default",ScenesManage)
-@mDefaultState
+import { MSMDsc } from "../StateMachine/StateDec";
+@MSMDsc.mState("Default",ScenesManage)
+@MSMDsc.mDefaultState
 export default class ScenesDefaultState extends ScenesState {
     loadScenes(name:string,time:number,callback:()=>void)
     {
