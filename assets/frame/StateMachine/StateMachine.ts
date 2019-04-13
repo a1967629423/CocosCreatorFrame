@@ -311,7 +311,7 @@ export class StateMachine extends cc.Component {
     {
         this.emit(eventName);
     }
-    protected listen(eventName:string)
+    listen(eventName:string)
     {
         if(!this.listenlist.find(value=>value.eventName===eventName))
         {
@@ -322,6 +322,14 @@ export class StateMachine extends cc.Component {
             })(eventName)
             this.listenlist.push({eventName:eventName,callback:callback})
             this.node.on(eventName,callback,this);
+        }
+    }
+    cancelListen(eventName:string)
+    {
+        var list = this.listenlist.find(vlaue=>vlaue.eventName===eventName)
+        if(list)
+        {
+            this.node.off(list.eventName,list.callback,this)
         }
     }
     onDestroy()
