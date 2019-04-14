@@ -10,11 +10,12 @@ export default class PrefabFactor extends cc.Component {
     Prefabs:cc.Prefab[] = []
     @property
     InitValue:number = 10;
-
     // LIFE-CYCLE CALLBACKS:
 
     // onLoad () {}
     PrefabPool:{name:string,pool:ObjectPool<cc.Node>,prefab:cc.Prefab}[] = []
+    private isStatic:boolean = false;
+    isLoaded:boolean = false;
     static NodePush(node:cc.Node)
     {
         var factory:PrefabFactor =node['__factory']
@@ -31,6 +32,19 @@ export default class PrefabFactor extends cc.Component {
             }
         }
     }
+    private static _Instance:PrefabFactor = null
+    static get Instance():PrefabFactor
+    {
+        if(!this._Instance)
+        {
+            var node = new cc.Node('staticPF');
+            var pf = node.addComponent(PrefabFactor);
+            pf.isStatic = true;
+            this._Instance = pf;
+        }
+        return this._Instance;
+    }
+    static Loaded:string = 'Loaded';
     Nodefactory(pre:cc.Prefab)
     {
         var node = cc.instantiate(pre);
@@ -38,7 +52,54 @@ export default class PrefabFactor extends cc.Component {
         node['__factory']=this;
         return node;
     }
-    start () {
+    LoadRes(path,type?:typeof cc.Asset):Promise<any>
+    {
+        return new Promise<any>((res,rej)=>{
+            if(type)
+            {
+                cc.loader.loadRes(path,type,(err,data)=>{
+                    if(err)
+                    {
+                        console.error('cc.loader.loadRes prefab/config.json '+err.message)
+                        rej();
+                    }
+                    else
+                    {
+                        res(data);
+                    }
+                })
+            }
+            else
+            {
+                cc.loader.loadRes(path,(err,data)=>{
+                    if(err)
+                    {
+                        console.error('cc.loader.loadRes prefab/config.json '+err.message)
+                        rej();
+                    }
+                    else
+                    {
+                        res(data);
+                    }
+                })
+            }
+        }) 
+    }
+    async LoadAllRes()
+    {
+        var data = await this.LoadRes('prefab/config');
+        if(data)
+        {
+            var config = JSON.parse(data);
+            for(var item of config.path)
+            {
+                this.Prefabs.push(await this.LoadRes(item,cc.Prefab)) 
+            }
+            this.PrefabPoolInit();
+        }
+    }
+    PrefabPoolInit()
+    {
         if(this.PrefabPool.length!=this.Prefabs.length)
         {
             this.Prefabs.forEach(value=>{
@@ -49,6 +110,17 @@ export default class PrefabFactor extends cc.Component {
                 }
                 this.PrefabPool.push({name:value.name,pool,prefab:value})
             })
+        }
+        this.node.emit(PrefabFactor.Loaded)
+    }
+    start () {
+        if(this.isStatic)
+        {
+            this.LoadAllRes();
+        }
+        else
+        {
+            this.PrefabPoolInit();
         }
     }
     pop(name:string|number):cc.Node
