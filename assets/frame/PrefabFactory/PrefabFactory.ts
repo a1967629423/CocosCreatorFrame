@@ -53,7 +53,7 @@ export default class PrefabFactor extends cc.Component {
         node['__factory']=this;
         return node;
     }
-    LoadRes(path,type?:typeof cc.Asset):Promise<any>
+    static LoadRes(path,type?:typeof cc.Asset):Promise<any>
     {
         return new Promise<any>((res,rej)=>{
             if(type)
@@ -88,13 +88,13 @@ export default class PrefabFactor extends cc.Component {
     }
     async LoadAllRes()
     {
-        var data = await this.LoadRes('prefab/config');
+        var data = await PrefabFactor.LoadRes('prefab/config');
         if(data)
         {
             var config = data.json;
             for(var item in config.path)
             {
-                this.Prefabs.push(await this.LoadRes(config.path[item],cc.Prefab)) 
+                this.Prefabs.push(await PrefabFactor.LoadRes(config.path[item],cc.Prefab)) 
             }
             this.PrefabPoolInit();
         }
