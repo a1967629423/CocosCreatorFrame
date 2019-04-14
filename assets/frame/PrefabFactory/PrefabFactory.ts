@@ -41,6 +41,7 @@ export default class PrefabFactor extends cc.Component {
             var pf = node.addComponent(PrefabFactor);
             pf.isStatic = true;
             this._Instance = pf;
+            cc.game.addPersistRootNode(node);
         }
         return this._Instance;
     }
@@ -90,10 +91,10 @@ export default class PrefabFactor extends cc.Component {
         var data = await this.LoadRes('prefab/config');
         if(data)
         {
-            var config = JSON.parse(data);
-            for(var item of config.path)
+            var config = data.json;
+            for(var item in config.path)
             {
-                this.Prefabs.push(await this.LoadRes(item,cc.Prefab)) 
+                this.Prefabs.push(await this.LoadRes(config.path[item],cc.Prefab)) 
             }
             this.PrefabPoolInit();
         }
@@ -116,6 +117,7 @@ export default class PrefabFactor extends cc.Component {
     start () {
         if(this.isStatic)
         {
+            
             this.LoadAllRes();
         }
         else
