@@ -86,9 +86,10 @@ export default class PrefabFactor extends cc.Component {
             }
         }) 
     }
+    static prefabConfig = 'prefab/config';
     async LoadAllRes()
     {
-        var data = await PrefabFactor.LoadRes('prefab/config');
+        var data = await PrefabFactor.LoadRes(PrefabFactor.prefabConfig);
         if(data)
         {
             var config = data.json;
